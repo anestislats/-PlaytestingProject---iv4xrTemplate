@@ -26,7 +26,7 @@ public class MyEnv extends W3DEnvironment {
      */
     public SimpleNavGraph navgraph ;
     
-	NethackWrapper nethackUnderTest ;
+	public NethackWrapper nethackUnderTest ;
 	
 	public MyEnv(NethackWrapper nhwrapper) {
 	    super() ;

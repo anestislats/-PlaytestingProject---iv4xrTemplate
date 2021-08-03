@@ -1,7 +1,7 @@
 package org.projectxy.iv4xrLib;
 
 import A.B.*;
-import alice.tuprolog.Int;
+//import alice.tuprolog.Int;
 import eu.iv4xr.framework.extensions.pathfinding.SimpleNavGraph;
 import eu.iv4xr.framework.mainConcepts.WorldEntity;
 import eu.iv4xr.framework.mainConcepts.WorldModel;
@@ -23,7 +23,7 @@ import javax.swing.JFrame;
 public class NethackWrapper {
 
     JFrame nethackWindow;
-    Screen nethack;
+    public Screen nethack;
     Boss boss;
     Mob mobs;
 
