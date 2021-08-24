@@ -20,7 +20,7 @@ import javax.swing.JFrame;
 public class NethackWrapper {
 
     JFrame nethackWindow;
-    Screen nethack;
+    public Screen nethack;
     Boss boss;
     Mob mobs;
 
@@ -166,6 +166,8 @@ public class NethackWrapper {
         playerStatus.properties.put("maxhealth", ps.maxHealth );	// Maybe no need for this
         playerStatus.properties.put("isAlive",  ps.alive);			// Boolean
         playerStatus.properties.put("aimingBow", nethack.aimingBow);	// Boolean - maybe shouldn't be here (?)
+        
+        playerStatus.properties.put("movingLifePointsLost", nethack.moveDeductedLife);	// The number of life points lost due to movement (initializes to 0 after using a health item)
         wom.elements.put(playerStatus.id, playerStatus);
 
         

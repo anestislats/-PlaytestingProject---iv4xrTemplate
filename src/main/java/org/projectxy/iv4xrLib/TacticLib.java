@@ -143,6 +143,8 @@ public class TacticLib {
 	            
 	            System.out.println(">>> FIRING BOW") ;
 	            
+	            String monsterId = Utils.monsterId(S, monsterLocation);
+	            
 //	            int previousMonsterLife = 0;
 //	            int currentMonsterLife = 10;
 //	            int playerAttackDamage = 0;
@@ -216,7 +218,9 @@ public class TacticLib {
 	                throw new IllegalArgumentException() ;
 	            }
 	            
-	            
+	            boolean correctAmountOfDealtDmg = Utils.checkDealtDamage(S, monsterId);
+		        System.out.println("Was the correct amount of damage dealt?		>>> "+ correctAmountOfDealtDmg);
+		        System.out.println();
 	            
 //	            for(WorldEntity e : S.wom.elements.values()) {
 //	                 if(e.type.equals(Monster.class.getSimpleName())) {
@@ -719,6 +723,11 @@ public class TacticLib {
 	        Vec3 agentCurrentPosition = S.wom.position ;
 	        int dx = (int) (monsterLocation.x - agentCurrentPosition.x) ;
 	        int dy = (int) (monsterLocation.y - agentCurrentPosition.y) ;
+	        
+	        
+	        String monsterId = Utils.monsterId(S, monsterLocation);
+	        
+	        
 	        if(dx>0) {
 	            //System.out.println(">>> Attack R") ;
 	            env.move(Movement.RIGHT) ;
@@ -738,6 +747,13 @@ public class TacticLib {
 	        else {
 	            throw new IllegalArgumentException() ;
 	        }
+	        
+	        
+	        boolean correctAmountOfDealtDmg = Utils.checkDealtDamage(S, monsterId);
+	        System.out.println("Was the correct amount of damage dealt?		>>> "+ correctAmountOfDealtDmg);
+	        System.out.println();
+	        
+	        
 	        // let's also reset the planned path, if there is any:
 	        S.currentPathToFollow = null ;
 	        S.updateState() ;
@@ -756,6 +772,8 @@ public class TacticLib {
 	                     //System.out.println(">>> monster is near: " + e.position) ;
 	                     return e.position ;
 	                 }
+	                 
+	                 
 	             }
 	         }
 	         return null ;       
@@ -770,9 +788,17 @@ public class TacticLib {
 		        
 				boolean bestWeaponEquipped = false;
 				
+				int bestWeaponDmg = Utils.bestWeaponDmg(S, itemId);
+				System.out.println("The selected weapon has "+ bestWeaponDmg +" damage");
+
+				
 	      		env_.interact(current.agentId, itemId, Interact.SelectItemFromInv);
 	      		
 	      		bestWeaponEquipped = true;
+	      		
+	      		boolean correctAmountOfWeaponDmg = Utils.checkWeaponDmg(bestWeaponDmg);
+	      		System.out.println("Is the weapon damage a valid amount? 		>>> "+ correctAmountOfWeaponDmg);
+	      		
 	   	    
 		        if(bestWeaponEquipped) {
 		        	
@@ -833,16 +859,20 @@ public class TacticLib {
 	    return action("use health item to stay alive").do2((MyAgentState S) -> (String itemId) -> { 
 	        MyEnv env_ = (MyEnv) S.env() ;
 	        WorldModel current = S.wom ;
+ 
+	        int itemRestoreAmount = Utils.itemRestoreAmount(S, itemId) ;
+	        System.out.println("The selected item has restore amount of "+ itemRestoreAmount);
 	        
-	
 			boolean healthItemUsed = false;
-			
-	
+
 	  		env_.interact(current.agentId, itemId, Interact.SelectItemFromInv);
-	  		
-	  		
 	  		healthItemUsed = true;
-	
+	  		
+	  		boolean correctAmountOfHealthRestored = Utils.checkHealthRestoreAmount(S, itemRestoreAmount);
+	  		
+			System.out.println("Was the correct amount of health restored? 		>>> "+ correctAmountOfHealthRestored);
+			System.out.println();
+			
 		    
 	        if(healthItemUsed) {
 	        	

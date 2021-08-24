@@ -258,76 +258,129 @@ public class Example_using_pathfinding {
 		    turn++;
 			System.out.println("[" + turn + "] agent@" + state.wom.position);
 			
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			
+			state.updateState();
 			
-			System.out.println("----------------------------PLAYER'S ATTACK DAMAGE------------------------------------") ;
+			String agentId = state.wom.agentId ;
 		    
-		    for (WorldEntity e: state.wom.elements.values()) {
-		    	
-		    	if(e.type.equals(Monster.class.getSimpleName()) && state.previousWom != null) {
-                	 
-            		 String monsterId = e.id ;
-            		 
-            		 WorldModel current = state.wom ;
-            		 WorldModel previous = state.previousWom ;
-            		 
-            		 WorldEntity monsterCurrentState = current.elements.get(monsterId) ;
-    	 	         WorldEntity monsterPreviousState = previous.elements.get(monsterId) ;
-    	 	         
-    	 	         
-    	 	         int currentMonsterLife = monsterCurrentState.getIntProperty("health");
-            		 int previousMonsterLife = monsterPreviousState.getIntProperty("health");
-            		 
-            		 
-            		 
-            		 // the player's equipped weapon 
-            		 String agentID = state.wom.agentId ;
-		    		 
-		    		 WorldEntity agentCurrentState = current.elements.get(agentID) ;
-		    		 String equippedWeapon = agentCurrentState.getStringProperty("equippedWeaponName");
-		    		 int equippedWeaponDmg = agentCurrentState.getIntProperty("equippedWeaponDmg");
-            		 
-            		 
-            		 
-            		 int lifeDif = previousMonsterLife - currentMonsterLife;
-            		 System.out.println("Agent at position " + state.wom.position + " attacks with "+ equippedWeapon + " for "+ equippedWeaponDmg + " damage");
-            		 System.out.println();
-            		 
-            		 System.out.println("Attack on: monster with id " + e.id + ", at position " + e.position );
-            		 System.out.println("Monster's current life: "+ currentMonsterLife);
-            		 System.out.println("Monster's previous life: "+ previousMonsterLife);
-            		 System.out.println("Player's attack damage: "+ lifeDif);
-            		 
-            		 
-            		 if (lifeDif!=0) {
-            			 
-            			 if (lifeDif == equippedWeaponDmg || currentMonsterLife == 0) {
-            				 
-            				 System.out.println("The attack damage is equal to the equipped weapon damage, or the monster was killed on this attack");
-            				 System.out.println();
-            				 
-            			 }
-            			 else {
-            				 
-            				 System.out.println("There was damage on the monster, but not the correct amount of it");
-            				 System.out.println();
-            			 }
-            			 
-            		 }
-            		 else {
-            			 
-            			 System.out.println("There was no damage at all on this turn");
-            			 System.out.println();
-            		 }
-            		 
-                		
-                 }
-		    	
-		    	
-		    }
+		    WorldModel current = state.wom ;
+			WorldModel previous = state.previousWom ;
+			 
+			WorldEntity agentCurrentState = current.elements.get(agentId) ;
+	        WorldEntity agentPreviousState = previous.elements.get(agentId) ;
+	        
+	        int currentAgentLife = agentCurrentState.getIntProperty("health");
+			int previousAgentLife = agentPreviousState.getIntProperty("health");
+			
+			int numOfNearbyMonsters = Utils.numberOfNearbyMonsters(state);
 		    
-		    System.out.println("-------------------------------------------------------------------------------------------") ;
-		    System.out.println("-------------------------------------------------------------------------------------------") ;
+			if (currentAgentLife<previousAgentLife && numOfNearbyMonsters !=0) {
+		    
+			    System.out.println("----------------------------MONSTER'S ATTACK DAMAGE------------------------------------") ;
+			    
+			    System.out.println("-------------------------------" + currentAgentLife) ;
+			    System.out.println("-------------------------------" + previousAgentLife) ;
+
+
+			    boolean correctAmountOfReceivedDmg = false;
+			    
+			    int dxPlusdy = Utils.dxPlusdy(state);
+			    
+			    
+			    
+			    if (numOfNearbyMonsters != 0) {
+			    	String nearMonsterId = Utils.nearMonsterId(state);
+			    	int monsterAttackDmg = Utils.monsterAttackDmg(state);
+			    	correctAmountOfReceivedDmg = Utils.checkReceivedDmg(state, numOfNearbyMonsters, monsterAttackDmg, dxPlusdy );
+			    }
+			    
+			    //int monsterAttackDmg = Utils.monsterAttackDmg(state);
+			    //boolean correctAmountOfReceivedDmg = Utils.checkReceivedDmg(state, numOfNearbyMonsters, monsterAttackDmg );
+			    
+			    System.out.println("Was the correct amount of damage received from the monsters?		>>> "+ correctAmountOfReceivedDmg);
+		        System.out.println();
+		        
+		        System.out.println("--------------------------------------------------------------------------------------") ;
+		        System.out.println("--------------------------------------------------------------------------------------") ;
+			}
+			
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+			
+//			System.out.println("----------------------------PLAYER'S ATTACK DAMAGE------------------------------------") ;
+//		    
+//		    for (WorldEntity e: state.wom.elements.values()) {
+//		    	
+//		    	if(e.type.equals(Monster.class.getSimpleName()) && state.previousWom != null) {
+//                	 
+//            		 String monsterId = e.id ;
+//            		 
+//            		 WorldModel current = state.wom ;
+//            		 WorldModel previous = state.previousWom ;
+//            		 
+//            		 WorldEntity monsterCurrentState = current.elements.get(monsterId) ;
+//    	 	         WorldEntity monsterPreviousState = previous.elements.get(monsterId) ;
+//    	 	         
+//    	 	         
+//    	 	         int currentMonsterLife = monsterCurrentState.getIntProperty("health");
+//            		 int previousMonsterLife = monsterPreviousState.getIntProperty("health");
+//            		 
+//            		 
+//            		 
+//            		 // the player's equipped weapon 
+//            		 String agentID = state.wom.agentId ;
+//		    		 
+//		    		 WorldEntity agentCurrentState = current.elements.get(agentID) ;
+//		    		 String equippedWeapon = agentCurrentState.getStringProperty("equippedWeaponName");
+//		    		 int equippedWeaponDmg = agentCurrentState.getIntProperty("equippedWeaponDmg");
+//		    		 
+//		    		 int moves = (int) state.wom.timestamp;
+//            		 
+//            		 
+//            		 
+//            		 int lifeDif = previousMonsterLife - currentMonsterLife;
+//            		 System.out.println("Agent at position " + state.wom.position + " attacks with "+ equippedWeapon + " for "+ equippedWeaponDmg + " damage");
+//            		 System.out.println();
+//            		 
+//            		 System.out.println(">>> Move: "+ moves);
+//            		 
+//            		 
+//            		 System.out.println("Attack on: monster with id " + e.id + ", at position " + e.position );
+//            		 System.out.println("Monster's current life: "+ currentMonsterLife);
+//            		 System.out.println("Monster's previous life: "+ previousMonsterLife);
+//            		 System.out.println("Player's attack damage: "+ lifeDif);
+//            		 
+//            		 
+//            		 if (lifeDif!=0) {
+//            			 
+//            			 if (lifeDif == equippedWeaponDmg || currentMonsterLife == 0) {
+//            				 
+//            				 System.out.println("The attack damage is equal to the equipped weapon damage, or the monster was killed on this attack");
+//            				 System.out.println();
+//            				 
+//            			 }
+//            			 else {
+//            				 
+//            				 System.out.println("There was damage on the monster, but not the correct amount of it");
+//            				 System.out.println();
+//            			 }
+//            			 
+//            		 }
+//            		 else {
+//            			 
+//            			 System.out.println("There was no damage at all on this turn");
+//            			 System.out.println();
+//            		 }
+//            		 
+//                		
+//                 }
+//		    	
+//		    	
+//		    }
+//		    
+//		    System.out.println("-------------------------------------------------------------------------------------------") ;
+//		    System.out.println("-------------------------------------------------------------------------------------------") ;
 			
 			
 			
@@ -441,153 +494,132 @@ public class Example_using_pathfinding {
 			
 			int turn = 0;
 			while (g1.getStatus().inProgress()) {
-			    System.out.println(">>> Agent @" + state.wom.position + ", alive:" + state.isAlive()) ;
+			    System.out.println(">>> Agent @" + state.wom.position + ", alive:" + state.isAlive() + ", move number: " + state.wom.timestamp) ;
+			    
+			    state.updateState();
+			    
+			    String agentId = state.wom.agentId ;
+			    
+			    WorldModel current = state.wom ;
+				WorldModel previous = state.previousWom ;
+				 
+				WorldEntity agentCurrentState = current.elements.get(agentId) ;
+		        WorldEntity agentPreviousState = previous.elements.get(agentId) ;
+		        
+		        int currentAgentLife = agentCurrentState.getIntProperty("health");
+				int previousAgentLife = agentPreviousState.getIntProperty("health");
+				
+				int numOfNearbyMonsters = Utils.numberOfNearbyMonsters(state);
+			    
+				if (currentAgentLife<previousAgentLife && numOfNearbyMonsters !=0) {
+			    
+				    System.out.println("----------------------------MONSTER'S ATTACK DAMAGE------------------------------------") ;
+				    
+				    System.out.println("-------------------------------" + currentAgentLife) ;
+				    System.out.println("-------------------------------" + previousAgentLife) ;
+
+
+				    boolean correctAmountOfReceivedDmg = false;
+				    
+				    int dxPlusdy = Utils.dxPlusdy(state);
+				    
+				    
+				    
+				    if (numOfNearbyMonsters != 0) {
+				    	String nearMonsterId = Utils.nearMonsterId(state);
+				    	int monsterAttackDmg = Utils.monsterAttackDmg(state);
+				    	correctAmountOfReceivedDmg = Utils.checkReceivedDmg(state, numOfNearbyMonsters, monsterAttackDmg, dxPlusdy );
+				    }
+				    
+				    //int monsterAttackDmg = Utils.monsterAttackDmg(state);
+				    //boolean correctAmountOfReceivedDmg = Utils.checkReceivedDmg(state, numOfNearbyMonsters, monsterAttackDmg );
+				    
+				    System.out.println("Was the correct amount of damage received from the monsters?		>>> "+ correctAmountOfReceivedDmg);
+			        System.out.println();
+			        
+			        System.out.println("--------------------------------------------------------------------------------------") ;
+			        System.out.println("--------------------------------------------------------------------------------------") ;
+				}
+			    
 			  
-			    
-			    System.out.println("----------------------------MONSTER'S ATTACK DAMAGE------------------------------------") ;
-			    
-			    //if (state.previousWom != null) {
-			    	
-			    	for (WorldEntity e: state.wom.elements.values()) {
-				    	
-				    	if(e.type.equals(Monster.class.getSimpleName()) && state.previousWom != null) {
-				    		
-				    		int monsterXPos = (int) e.position.x;
-				    		int monsterYPos = (int) e.position.y;
-				    		
-				    		int agentXPos = (int) state.wom.position.x;
-				    		int agentYPos = (int) state.wom.position.y;
-				    		
-				    		
-				    		int dx = (int) Math.abs(agentXPos-monsterXPos) ; // agent-monster distance in x axis
-			                int dy = (int) Math.abs(agentYPos-monsterYPos) ; // agent-monster distance in y axis
-				    		
-			                if (dx+dy <=1) {
-			                	
-			                	
-			                	 String agentId = state.wom.agentId ;
-					    		 String monsterId = e.id ;
-			                	
-			                	 WorldModel current = state.wom ;
-					    		 WorldModel previous = state.previousWom ;
-					    		 
-					    		 WorldEntity agentCurrentState = current.elements.get(agentId) ;
-					 	         WorldEntity agentPreviousState = previous.elements.get(agentId) ;
-			                	
-			                	
-					    		 
-					    		 
-					    		 
-					    		 
-					    		 //get the monster's attack damage
-					    		 WorldEntity monsterCurrentState = current.elements.get(monsterId) ;
-			    	 	         //WorldEntity monsterPreviousState = previous.elements.get(monsterId) ;
-			    	 	         
-					    		 int monsterDmg = monsterCurrentState.getIntProperty("attackDmg");
-					    		 
-					    		 
-					    		 
-					 	         
-					 	         int currentAgentLife = agentCurrentState.getIntProperty("health");
-					    		 int previousAgentLife = agentPreviousState.getIntProperty("health");
-					    		 
-					    		 
-					    		 
-					    		 
-					    		 // every 8 moves, player loses 1 life point
-					    		 int movePoints = 0;
-					    		 int  moves = (int) state.wom.timestamp;
-					    		 if (moves % 8 == 0) {
-					    			 System.out.println("1 life point was lost due to 8 moves player made");
-					    			 System.out.println(">>>>>>>	Moves: "+ moves);
-					    			 System.out.println(">>>>>>>	Turn: "+ turn);
-					    			 System.out.println();
-					    			 movePoints++;
-					    		 }
-					    		 
-					    		 
-					    		 int lifeDif = previousAgentLife - currentAgentLife + movePoints ;
-					    		 
-					    		 System.out.println("Agent current life: "+ currentAgentLife);
-					    		 System.out.println("Agent previous life: "+ previousAgentLife);
-					    		 System.out.println("Monster's attack damage: "+ lifeDif);
-					    		 System.out.println("Actual Monster's attack damage: "+ monsterDmg);
-					    		 System.out.println();
-					    		 
-					    		 
-					    		 
-					    		 //lifeDif = 0;
-			                	
-			                	
-			                	
-			                	
-			                	
-			                	
-			                	
-			                	
-			                	
-			                	
-			                }
-			                
-			                
-			                
-			                
-			                
-			                
-			                
-			                }
-				    	}
-			    	
-			    
-//		    		 String agentID = state.wom.agentId ;
-//		    		 
-//		    		 WorldModel current = state.wom ;
-//		    		 WorldModel previous = state.previousWom ;
-//		    		 
-//		    		 WorldEntity agentCurrentState = current.elements.get(agentID) ;
-//		 	         WorldEntity agentPreviousState = previous.elements.get(agentID) ;
-//		 	         
-//		 	         
-//		 	         int currentAgentLife = agentCurrentState.getIntProperty("health");
-//		    		 int previousAgentLife = agentPreviousState.getIntProperty("health");
-//		    		 
-//		    		 // monster's attack damage
-//		    		 int monsterAttackDmg = 
-//		    		 
-//		    		 
-//		    		
-//		    		 
-//		    		 int lifeDif = previousAgentLife - currentAgentLife;
-//		    		 
-//		    		 
-//		    		 // every 8 moves, player loses 1 life point
-//		    		 long moves = state.wom.timestamp;
-//		    		 if (moves % 8 == 0) {
-//		    			 System.out.println("1 life point was lost due to 8 moves player made");
-//		    			 System.out.println(">>>>>>>	Moves: "+ moves);
-//		    			 System.out.println(">>>>>>>	Turn: "+ turn);
-//		    			 lifeDif++;
-//		    		 }
-//		    		 
-//		    		 
-//		    		 System.out.println("Agent current life: "+ currentAgentLife);
-//		    		 System.out.println("Agent previous life: "+ previousAgentLife);
-//		    		 System.out.println("Monster's attack damage: "+ lifeDif);
-//		    		 
-//		    		 
-//		    		 
-//		    		 lifeDif = 0;
-			    //}
-	            		 
-	                	
-			    
-			    System.out.println("-------------------------------------------------------------------------------------------") ;
-			    System.out.println("-------------------------------------------------------------------------------------------") ;
-			    
-			    
-			    
-			    
-			    
+//			    
+//			    System.out.println("----------------------------MONSTER'S ATTACK DAMAGE------------------------------------") ;
+//			    	
+//			    	for (WorldEntity e: state.wom.elements.values()) {
+//				    	
+//				    	if(e.type.equals(Monster.class.getSimpleName()) && state.previousWom != null) {
+//				    		
+//				    		int monsterXPos = (int) e.position.x;
+//				    		int monsterYPos = (int) e.position.y;
+//				    		
+//				    		int agentXPos = (int) state.wom.position.x;
+//				    		int agentYPos = (int) state.wom.position.y;
+//				    		
+//				    		int eAttackDmg = e.getIntProperty("attackDmg");
+//				    		
+//				    		System.out.println(">>>>>>>> Monster Attack Damage: "+ eAttackDmg);
+//				    		
+//				    		int dx = (int) Math.abs(agentXPos-monsterXPos) ; // agent-monster distance in x axis
+//			                int dy = (int) Math.abs(agentYPos-monsterYPos) ; // agent-monster distance in y axis
+//				    		
+//			                if (dx+dy <=1) {
+//			                	
+//			                	
+//			                	 String agentId = state.wom.agentId ;
+//					    		 String monsterId = e.id ;
+//			                	
+//			                	 WorldModel current = state.wom ;
+//					    		 WorldModel previous = state.previousWom ;
+//					    		 
+//					    		 WorldEntity agentCurrentState = current.elements.get(agentId) ;
+//					 	         WorldEntity agentPreviousState = previous.elements.get(agentId) ;
+//			                	
+//					    		 
+//					    		 //get the monster's attack damage
+//					    		 WorldEntity monsterCurrentState = current.elements.get(monsterId) ;
+//			    	 	         //WorldEntity monsterPreviousState = previous.elements.get(monsterId) ;
+//			    	 	         
+//					    		 int monsterDmg = monsterCurrentState.getIntProperty("attackDmg");
+//					    		 
+//					    		 
+//					 	         
+//					 	         int currentAgentLife = agentCurrentState.getIntProperty("health");
+//					    		 int previousAgentLife = agentPreviousState.getIntProperty("health");
+//					    		 
+//					    		 
+//					    		 // every 8 moves, player loses 1 life point
+//					    		 int movePoints = 0;
+//					    		 int  moves = (int) state.wom.timestamp;
+//					    		 if (moves % 8 == 0) {
+//					    			 System.out.println("1 life point was lost due to 8 moves player made");
+//					    			 System.out.println(">>>>>>>	Moves: "+ moves);
+//					    			 System.out.println(">>>>>>>	Turn: "+ turn);
+//					    			 System.out.println();
+//					    			 movePoints++;
+//					    		 }
+//					    		 
+//					    		 
+//					    		 int lifeDif = previousAgentLife - currentAgentLife + movePoints ;
+//					    		 
+//					    		 System.out.println("Agent current life: "+ currentAgentLife);
+//					    		 System.out.println("Agent previous life: "+ previousAgentLife);
+//					    		 System.out.println("Monster's attack damage: "+ lifeDif);
+//					    		 System.out.println("Actual Monster's attack damage: "+ monsterDmg);
+//					    		 System.out.println();
+//					    		 
+//					    		 
+//			                	
+//			                }
+//			                
+//			                
+//			                
+//			                }
+//				    	}
+//			    	
+//			    
+//			    System.out.println("-------------------------------------------------------------------------------------------") ;
+//			    System.out.println("-------------------------------------------------------------------------------------------") ;			    
+			   
 			    
 			    agent.update();
 			    turn++;
