@@ -12,30 +12,13 @@ import A.B.*;
 
 
 
-
-
 /**
- * This class provides the interface between iv4XR test agents and your System Under Test
- * (SUT). This interface provides methods that allow agents to control the SUT
- * and to obtain information about the SUT state. You have to implement at least
- * the methods listed below.
- * 
- * A word of caution first: keep in mind that an iv4XR agent is often used to control an
- * agent that lives in the world of your SUT. We will call the second agent in-SUT agent.
- * Your iv4XR agent X, might instruct an in-SUT agent A to interact with another in-SUT
- * agent B. I hope this is a bit clear :)
- * 
- * (1) The primary method you should implement is the method sendCommand_(cmd). However,
- * your iv4XR agent X will prefer to control the SUT through more abstract methods, rather
- * than by directly invoking sendCommand_(). For this reason below we give some examples
- * of such more-abstract methods such as move() and interact().
- * 
- * (2) The agent's runtime assumes you provide the method observe() ... see below. So,
- * you should have this method.
- * 
+ * This class MyEnv provides the interface between iv4XR test agents and the game Nethack
+ * (more precisely, with a simplified Java-clone of the original Nethack).
+ * We will not interact directly with Nethack, but rather MyEnv interacts with it through
+ * a "wrapper" cally NethackWrapper. The latter provides a set of more convenient methods
+ * for interactions, that also return observations in term of World Models.
  */
-
-
 public class MyEnv extends W3DEnvironment {
 
     /**
@@ -137,74 +120,46 @@ public class MyEnv extends W3DEnvironment {
 		return SUTstate ;
 	}
 
-	/**
-	 * Send a command to the SUT to to send back its state. You should have this method,
-	 * as the agent's framework automatically invoke it at every update cycle.
-	 * 
-	 * The effect of this method is equivalent to calling:
-	 * 
-	 *     sendCommand_(new EnvOperation(agentId,null,"Observe",null,Dontcare.class)
-	 *     
-	 *     
-	 * the result is cast to WorldModel (eu.iv4xr.framework.mainConcepts.WorldModel).    
-	 * 
-	 * In principle you don't need to redefine this method as long as you define the
-	 * corresponding logic in sendCommand_().
-	 */
+
+	// Left unimplemented as we prefer another signature
 	@Override
 	public WorldModel observe(String agentId) {
 	    throw new UnsupportedOperationException() ;
 		// return (WorldModel) sendCommand("player",null,"Observe",null,WorldModel.class) ;
 	}	
 	
-	
+	/**
+	 * This will return the state of the Nethack, in terms of a WorldModel.
+	 */
 	public WorldModel observe() {
         return (WorldModel) sendCommand("player",null,"Observe",null,WorldModel.class) ;
     }
 
 	/**
-	 * Command the in-SUT agentId to interact on another in-SURT entity identified by
+	 * Command the player-character in Nethack to interact with an in-game entity identified by
 	 * targetId. This method pass the call to sendCommand(..) from an ancestor class, 
 	 * which in turn will call your sendCommand_() above. The effect is equivalent to
 	 * calling:
 	 * 
-	 *     sendCommand_(new EnvOperation(agentId,targetId,"Interact",null,Dontcare.class)
+	 *     sendCommand_(new EnvOperation(...,targetId,"Interact",...)
 	 *     
-	 *     
-	 * the result of sendCommand_ is then cast to WorldModel (eu.iv4xr.framework.mainConcepts.WorldModel).    
-	 * 
-	 * In principle you don't need to redefine this method as long as you define the
-	 * corresponding logic in sendCommand_().
+	 * the result of sendCommand_ is then cast to WorldModel (eu.iv4xr.framework.mainConcepts.WorldModel). 
+	 * The agentId is ignored as there is only one agent in the game.   
 	 */
 	public WorldModel interact(String agentId, String targetId, NethackWrapper.Interact typeOfInteract ) {
 		return (WorldModel) sendCommand(agentId, targetId, "Interact", typeOfInteract, WorldModel.class);
 	}
 
 
-	/**
-	 * A command to instruct the in-SUT agentId to move a small distance towards the given
-	 * target location. The method pass the call to sendCommand(..) from an ancestor class, 
-	 * which in turn will call your sendCommand_() above. The effect is equivalent to
-	 * calling:
-	 * 
-	 *     sendCommand_(new EnvOperation(agentId,
-	 *                                   null,
-	 *                                   "Move",
-	 *                                   Pair(agentLocation,targetLocation),
-	 *                                   Dontcare.class)
-	 *     
-	 *     
-	 * the result is cast to WorldModel (eu.iv4xr.framework.mainConcepts.WorldModel).    
-	 * 
-	 * In principle you don't need to redefine this method as long as you define the
-	 * corresponding logic in sendCommand_().
-	 */
+    // Left unimplemented as we prefer another signature.
 	@Override
 	public WorldModel moveToward(String agentId, Vec3 agentLocation, Vec3 targetLocation) {
 		throw new UnsupportedOperationException() ;
 	}
 	
-	
+	/**
+	 * Move the player chacracter one square in the given direction.
+	 */
 	public WorldModel move(NethackWrapper.Movement direction) {
         return (WorldModel) sendCommand("player",null,
                 "Move",
@@ -219,8 +174,11 @@ public class MyEnv extends W3DEnvironment {
 	 * 
 	 * In principle you don't need to redefine this method as long as you define the
 	 * corresponding logic in sendCommand_().
+	 * 
+	 * Left unimplmented. Loading the mesh is done through another mechanism.
 	 */
-	public void dd() {
+	@Override
+	public void loadWorld() {
 	    throw new UnsupportedOperationException() ;
 	}
 	

@@ -1,7 +1,7 @@
 package org.projectxy.iv4xrLib;
 
 import A.B.*;
-import alice.tuprolog.Int;
+//import alice.tuprolog.Int;
 import eu.iv4xr.framework.extensions.pathfinding.SimpleNavGraph;
 import eu.iv4xr.framework.mainConcepts.WorldEntity;
 import eu.iv4xr.framework.mainConcepts.WorldModel;
@@ -17,6 +17,9 @@ import java.io.IOException;
 import java.util.*;
 import javax.swing.JFrame;
 
+/**
+ * This wrapper provides a higher level interface to observe and control the NethackClone game.
+ */
 public class NethackWrapper {
 
     JFrame nethackWindow;
@@ -55,6 +58,9 @@ public class NethackWrapper {
         nethack.stopAtNextUpdate();
     }
 
+    /**
+     * Return the navigation-graph of the current level.
+     */
     public SimpleNavGraph getNavigationGraph() {
         
         // Create a blank navigation-graph. We will use MyNavGraph, which was
@@ -222,8 +228,6 @@ public class NethackWrapper {
     /**
      * Construct the WorldEntity-representation of an item.
      */
-    
-    
     WorldEntity convertItem(Item item) {
         WorldEntity item_ = new WorldEntity(item.ID, item.getClass().getSimpleName(), true);
 
@@ -267,10 +271,17 @@ public class NethackWrapper {
 
 ///////////////////////////////////////////////////////////////////
 
+    /**
+     * Return the current state of the the Nethack-game. The state is returned as an instance of
+     * a WorldModel.
+     */
     public WorldModel observe() {
         return getNetHackState();
     }
 
+    /**
+     * Instruct Nethack to start a new game.
+     */
     public void startNewGame() {
         System.out.println("Start New Game");
         KeyEvent e = new KeyEvent(nethackWindow, KeyEvent.KEY_PRESSED, 1, 0, KeyEvent.VK_ENTER,
@@ -278,6 +289,9 @@ public class NethackWrapper {
         nethack.keyPressed(e);
     }
 
+    /**
+     * Instruct Nethack to restart a game, if the player is dead.
+     */
     public void restartGame() {
         System.out.println("Restart Game");
         if (!nethack.ps.getAlive()) {
@@ -294,6 +308,9 @@ public class NethackWrapper {
         UP, DOWN, LEFT, RIGHT, DONOTHING
     }
 
+    /**
+     * Instruct the player character to move one qquare to the specified direction.
+     */
     public WorldModel move(Movement mv) {
 
         int key;
@@ -342,6 +359,9 @@ public class NethackWrapper {
         return observe();
     }
 
+    /**
+     * Use an item in the player's inventory.
+     */
     public WorldModel useItem(String itemId) {
         int N = nethack.ps.inventory.size();
         for (int index = 0; index < N; index++) {
@@ -360,6 +380,9 @@ public class NethackWrapper {
         OpenInv, SelectItemFromInv, AimWithBow, PickupItem, NavigateInvUp, NavigateInvDown
     }
 
+    /**
+     * Instruct the player character to do a certain type of interaction.
+     */
     public WorldModel action(Interact act, String itemId) {
 
         int key = -1;
