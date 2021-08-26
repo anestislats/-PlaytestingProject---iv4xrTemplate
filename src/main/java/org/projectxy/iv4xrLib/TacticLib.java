@@ -870,6 +870,7 @@ public class TacticLib {
 	  		boolean correctAmountOfHealthRestored = Utils.checkHealthRestoreAmount(S, itemRestoreAmount);
 	  		
 			System.out.println("Was the correct amount of health restored? 		>>> "+ correctAmountOfHealthRestored);
+			System.out.println("Moves: "+ S.wom.timestamp);
 			System.out.println();
 			
 		    

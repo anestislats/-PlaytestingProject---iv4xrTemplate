@@ -415,6 +415,8 @@ public class Example_using_pathfinding {
 		agent.attachState(state);
 		MyEnv env = new MyEnv(driver);
 		agent.attachEnvironment(env);
+		
+		//state.updateState();
 
 		for (WorldEntity e : state.wom.elements.values()) {
 			System.out.println(">>> " + e.type + ", id=" + e.id + ", @" + e.position);
@@ -494,9 +496,10 @@ public class Example_using_pathfinding {
 			
 			int turn = 0;
 			while (g1.getStatus().inProgress()) {
+				state.updateState();
 			    System.out.println(">>> Agent @" + state.wom.position + ", alive:" + state.isAlive() + ", move number: " + state.wom.timestamp) ;
 			    
-			    state.updateState();
+			    //state.updateState();
 			    
 			    String agentId = state.wom.agentId ;
 			    

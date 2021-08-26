@@ -174,6 +174,7 @@ public class NethackWrapper {
         playerStatus.properties.put("aimingBow", nethack.aimingBow);	// Boolean - maybe shouldn't be here (?)
         
         playerStatus.properties.put("movingLifePointsLost", nethack.moveDeductedLife);	// The number of life points lost due to movement (initializes to 0 after using a health item)
+        playerStatus.properties.put("playerTurn", nethack.playerTurn);
         wom.elements.put(playerStatus.id, playerStatus);
 
         

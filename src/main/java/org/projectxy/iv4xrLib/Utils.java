@@ -325,6 +325,7 @@ public class Utils {
     public static int dxPlusdy(MyAgentState S) {
     	
     	//S.updateState();
+    	int diff = 70; //half of the maximum distance in the map 90x50
     	
     	for (WorldEntity e: S.wom.elements.values()) {
 	    	
@@ -339,10 +340,15 @@ public class Utils {
 	    		int dx = (int) Math.abs(agentXPos-monsterXPos) ; // agent-monster distance in x axis
                 int dy = (int) Math.abs(agentYPos-monsterYPos) ; // agent-monster distance in y axis
                 
-                return dx+dy;
+                if ( dx+dy < diff ) {
+                	
+                	diff = dx+dy;
+                }
+                
+                //return dx+dy;
 	    	}
 	    }
-    	return 10;
+    	return diff;
     	
     }
     
@@ -384,9 +390,15 @@ public class Utils {
 		
 		int movePoints = agentCurrentState.getIntProperty("movingLifePointsLost");
 		int previousMovePoints = agentPreviousState.getIntProperty("movingLifePointsLost");
+		
+		boolean playerTurn = agentCurrentState.getBooleanProperty("playerTurn");
+		
 		int lifeDif;
 		
-		if (dxPlusdy<=1 && movePoints!= previousMovePoints ) {
+		int steps = (int) S.wom.timestamp;
+		
+		
+		if ( dxPlusdy<=1 && steps%8==0 ) {
 		
 			lifeDif = previousAgentLife - (currentAgentLife + 1) ;
 		}
@@ -399,6 +411,10 @@ public class Utils {
 		
 		
 		System.out.println("movepoints: " + movePoints);
+		System.out.println("steps: " + steps);
+		System.out.println("dxPlusdy: " + dxPlusdy);
+		
+
 		System.out.println("previousAgentLife: " + previousAgentLife);
 		System.out.println("currentAgentLife: " + currentAgentLife);
 		System.out.println("lifeDif: " + lifeDif);
