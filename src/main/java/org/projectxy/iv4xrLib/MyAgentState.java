@@ -5,6 +5,7 @@ import java.util.*;
 import eu.iv4xr.framework.extensions.pathfinding.AStar;
 import eu.iv4xr.framework.extensions.pathfinding.Pathfinder;
 import eu.iv4xr.framework.extensions.pathfinding.SimpleNavGraph;
+import eu.iv4xr.framework.mainConcepts.TestAgent;
 import eu.iv4xr.framework.mainConcepts.WorldEntity;
 import eu.iv4xr.framework.mainConcepts.WorldModel;
 import eu.iv4xr.framework.spatial.LineIntersectable;
@@ -15,7 +16,8 @@ import nl.uu.cs.aplib.mainConcepts.Environment;
 
 public class MyAgentState extends State {
 
-    
+    public TestAgent owner ;
+	
     /**
      * The SUT's previous state.
      */

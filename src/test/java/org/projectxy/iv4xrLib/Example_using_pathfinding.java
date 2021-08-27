@@ -6,15 +6,18 @@ import static nl.uu.cs.aplib.AplibEDSL.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.IOException;
+import java.util.stream.Collector;
 
-
+import eu.iv4xr.framework.mainConcepts.ObservationEvent.ScalarTracingEvent;
 import eu.iv4xr.framework.mainConcepts.TestAgent;
+import eu.iv4xr.framework.mainConcepts.TestDataCollector;
 import eu.iv4xr.framework.mainConcepts.WorldEntity;
 import eu.iv4xr.framework.mainConcepts.WorldModel;
 import eu.iv4xr.framework.spatial.Vec3;
 
 import nl.uu.cs.aplib.mainConcepts.GoalStructure;
-
+import nl.uu.cs.aplib.utils.Pair;
 import A.B.Monster;
 import A.B.HealthPotion;
 import A.B.Food;
@@ -29,7 +32,7 @@ import A.B.Bow;
 public class Example_using_pathfinding {
 
 	@Test
-	public void test_navigate_to_a_location() throws InterruptedException {
+	public void test_navigate_to_a_location() throws InterruptedException, IOException {
 		// launch the game:
 		NethackWrapper driver = new NethackWrapper();
 		driver.launchNethack(new NethackConfiguration());
@@ -37,9 +40,12 @@ public class Example_using_pathfinding {
 		// Create an agent, and attaching to it a clean state and environment:
 		TestAgent agent = new TestAgent();
 		MyAgentState state = new MyAgentState();
+		TestDataCollector collector = new TestDataCollector() ;
 		agent.attachState(state);
+		state.owner = agent ;
 		MyEnv env = new MyEnv(driver);
 		agent.attachEnvironment(env);
+		agent.setTestDataCollector(collector) ;
 
 		// give a goal-structure to the agent:
 		Vec3 destination = new Vec3(40, 6, 0);
@@ -54,8 +60,21 @@ public class Example_using_pathfinding {
 		// new Scanner(System.in) . nextLine() ;
 
 		int turn = 0;
+		int numberOfFailingCheck = 0 ;
 		while (!g.getStatus().success()) {
-			agent.update();
+			
+			int numberOfNewFails = agent.getTestDataCollector().getNumberOfFailVerdictsSeen() -  numberOfFailingCheck ;
+			numberOfFailingCheck += numberOfNewFails ;
+			
+			ScalarTracingEvent scalarValues = new ScalarTracingEvent(
+					new Pair("posx", state.wom.position.x) ,
+					new Pair("posz", state.wom.position.y) ,
+					new Pair("newFails", numberOfNewFails)
+					// new Pair("health"), .... the health of agent
+					) ;		
+			agent.getTestDataCollector().registerEvent(agent.getId(), scalarValues);
+			
+			agent.update();		
 			turn++;
 			System.out.println("[" + turn + "] agent@" + state.wom.position);
 			Thread.sleep(100);
@@ -65,6 +84,12 @@ public class Example_using_pathfinding {
 			}
 		}
 		assertTrue(Utils.sameTile(state.wom.position, destination));
+		
+		System.out.println("** Number of passes: "  + collector.getNumberOfPassVerdictsSeen()) ;
+		System.out.println("** Number of violations: "  + collector.getNumberOfFailVerdictsSeen()) ;
+		//collector.getTestAgentTrace(agent.getId()) ;
+		assertTrue(collector.getNumberOfFailVerdictsSeen() == 0) ;
+		collector.saveTestAgentScalarsTraceAsCSV(agent.getId(), "filename.csv");
 	}
  
 	// this test fails because a monster moves to block a tile along the path;

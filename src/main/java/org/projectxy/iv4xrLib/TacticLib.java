@@ -15,7 +15,9 @@ import A.B.Food;
 import A.B.HealthPotion;
 import A.B.Monster;
 import A.B.Water;
+import eu.iv4xr.framework.mainConcepts.ObservationEvent.VerdictEvent;
 import eu.iv4xr.framework.mainConcepts.TestAgent;
+import eu.iv4xr.framework.mainConcepts.TestDataCollector;
 import eu.iv4xr.framework.mainConcepts.W3DAgentState;
 import eu.iv4xr.framework.mainConcepts.WorldEntity;
 import eu.iv4xr.framework.mainConcepts.WorldModel;
@@ -873,7 +875,15 @@ public class TacticLib {
 			System.out.println("Moves: "+ S.wom.timestamp);
 			System.out.println();
 			
-		    
+			TestDataCollector collector = S.owner.getTestDataCollector() ;
+			if(collector != null) {
+				VerdictEvent verdict = new VerdictEvent("Health restoration checking",
+						itemId + " restoring " + itemRestoreAmount,
+						correctAmountOfHealthRestored) ;
+				collector.registerEvent(S.owner.getId(), verdict) ;
+			}
+			
+		 
 	        if(healthItemUsed) {
 	        	
 	            S.updateState() ;
