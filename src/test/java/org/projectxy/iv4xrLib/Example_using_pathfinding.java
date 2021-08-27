@@ -231,6 +231,8 @@ public class Example_using_pathfinding {
 		agent.attachState(state);
 		MyEnv env = new MyEnv(driver);
 		agent.attachEnvironment(env);
+		
+		
 
 		for (WorldEntity e : state.wom.elements.values()) {
 			System.out.println(">>> " + e.type + ", id=" + e.id + ", @" + e.position);
