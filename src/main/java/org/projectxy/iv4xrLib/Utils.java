@@ -1,16 +1,33 @@
 package org.projectxy.iv4xrLib;
 
+
+
 import eu.iv4xr.framework.extensions.pathfinding.SimpleNavGraph;
 import eu.iv4xr.framework.mainConcepts.WorldEntity;
 import eu.iv4xr.framework.mainConcepts.WorldModel;
 import eu.iv4xr.framework.spatial.Vec3;
 import nl.uu.cs.aplib.utils.Pair;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import A.B.Monster;
+import A.B.*;
+
+
+
+
+
+
 
 
 public class Utils {
+	
+	public static ArrayList<Monster> mobs;
+	
+	//mobs = new ArrayList<Monster>();
+
+
 
     /**
      * Convert a 3D coordinate p to a discrete tile-world coordinate. Basically, p
@@ -92,7 +109,7 @@ public class Utils {
 			
 			
 		}
-    	return -1;
+    	return 0;
     	
     	
     }
@@ -162,7 +179,7 @@ public class Utils {
 			
 			
 		}
-    	return -1;
+    	return 0;
     	
     	
     }
@@ -180,6 +197,23 @@ public class Utils {
 		
     	
     }
+    
+    
+    public static boolean checkRestoreItemAmount(int restoreAmount ) {
+    	
+		System.out.println("The current item restores: "+ restoreAmount + " life points");
+		
+		if (restoreAmount <=0) { // Item weapon damage cannot be below or equal to 0
+			System.out.println("The health item cannot restore negative or equal to 0 amount of life points");
+			System.out.println();
+			return false;
+		}
+		else return true;
+		
+    	
+    }
+    
+    
     
     
     public static String monsterId (MyAgentState S, Vec3 monsterLocation ) {
@@ -360,6 +394,20 @@ public class Utils {
     	
     	//S.updateState();
     	
+//    	for(int i =0; i < mobs.size(); i++){
+//			if(mobs.get(i).getAlive() && mobs.get(i).canAttackPlayer((int) S.wom.position.x, (int) S.wom.position.y)){
+//				
+//				int eAttackDmg = mobs.get(i).getAttackDmg();
+//	    		return eAttackDmg;
+//				
+//				
+//			}
+//    	}
+			
+			
+    	
+    	
+    	
     	for (WorldEntity e: S.wom.elements.values()) {
 	    	
 	    	if(e.type.equals(Monster.class.getSimpleName()) && S.previousWom != null) {
@@ -369,7 +417,7 @@ public class Utils {
                 
 	    	}
 	    }
-    	return -1;
+    	return 0;
     }
     
     
@@ -400,14 +448,14 @@ public class Utils {
 		
 		if ( dxPlusdy<=1 && steps%8==0 ) {
 		
-			lifeDif = previousAgentLife - (currentAgentLife + 1) ;
+			lifeDif = previousAgentLife - (currentAgentLife + 1);
 		}
 		else {
 			
 			lifeDif = previousAgentLife - currentAgentLife ;
 		}
 		
-		int totalMonsterDmg = monsterAttackDmg*numOfNearbyMonsters;
+		int totalMonsterDmg = monsterAttackDmg * numOfNearbyMonsters;
 		
 		
 		System.out.println("movepoints: " + movePoints);
@@ -428,7 +476,7 @@ public class Utils {
 		
 		
 		
-		if (lifeDif == totalMonsterDmg) {
+		if (lifeDif == totalMonsterDmg || currentAgentLife==0 || lifeDif==0 ) {
 			
 			System.out.println("The damage of the monsters was dealt correctly on the agent");
 			System.out.println();

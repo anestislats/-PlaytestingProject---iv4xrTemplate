@@ -213,6 +213,15 @@ public class TacticLib {
 	            boolean correctAmountOfDealtDmg = Utils.checkDealtDamage(S, monsterId);
 		        System.out.println("Was the correct amount of damage dealt?		>>> "+ correctAmountOfDealtDmg);
 		        System.out.println();
+		        
+		        
+		        TestDataCollector collector = S.owner.getTestDataCollector() ;
+				if(collector != null) {
+					VerdictEvent verdict = new VerdictEvent("Dealing damage",
+							" The amount of dealt damage after the (bow) attack was the expected ",
+							correctAmountOfDealtDmg) ;
+					collector.registerEvent(S.owner.getId(), verdict) ;
+				}
 	            
 //	            for(WorldEntity e : S.wom.elements.values()) {
 //	                 if(e.type.equals(Monster.class.getSimpleName())) {
@@ -750,6 +759,16 @@ public class TacticLib {
 	        System.out.println("Was the correct amount of damage dealt?		>>> "+ correctAmountOfDealtDmg);
 	        System.out.println();
 	        
+	        TestDataCollector collector = S.owner.getTestDataCollector() ;
+			if(collector != null) {
+				VerdictEvent verdict = new VerdictEvent("Dealing damage",
+						" The amount of dealt damage after the (melee) attack was the expected ",
+						correctAmountOfDealtDmg) ;
+				collector.registerEvent(S.owner.getId(), verdict) ;
+			}
+	        
+	        
+	        
 	        
 	        // let's also reset the planned path, if there is any:
 	        S.currentPathToFollow = null ;
@@ -795,6 +814,15 @@ public class TacticLib {
 	      		
 	      		boolean correctAmountOfWeaponDmg = Utils.checkWeaponDmg(bestWeaponDmg);
 	      		System.out.println("Is the weapon damage a valid amount? 		>>> "+ correctAmountOfWeaponDmg);
+	      		
+	      		
+	      		TestDataCollector collector = S.owner.getTestDataCollector() ;
+				if(collector != null) {
+					VerdictEvent verdict = new VerdictEvent("Equipped weapon damage",
+							itemId + " has damage of " + bestWeaponDmg,
+							correctAmountOfWeaponDmg) ;
+					collector.registerEvent(S.owner.getId(), verdict) ;
+				}
 	      		
 	   	    
 		        if(bestWeaponEquipped) {

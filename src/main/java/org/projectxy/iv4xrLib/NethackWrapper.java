@@ -173,8 +173,9 @@ public class NethackWrapper {
         playerStatus.properties.put("isAlive",  ps.alive);			// Boolean
         playerStatus.properties.put("aimingBow", nethack.aimingBow);	// Boolean - maybe shouldn't be here (?)
         
-        playerStatus.properties.put("movingLifePointsLost", nethack.moveDeductedLife);	// The number of life points lost due to movement (initializes to 0 after using a health item)
-        playerStatus.properties.put("playerTurn", nethack.playerTurn);
+        playerStatus.properties.put("movingLifePointsLost", nethack.moveDeductedLife);	// The number of life points lost due to movement
+        playerStatus.properties.put("playerTurn", nethack.playerTurn);					// if true during the game, then its player's turn to make a move
+        playerStatus.properties.put("seedNumber", nethack.seed);						// the seed number of the random level generator
         wom.elements.put(playerStatus.id, playerStatus);
 
         
