@@ -3,8 +3,10 @@ package org.projectxy.iv4xrLib;
 
 
 import eu.iv4xr.framework.extensions.pathfinding.SimpleNavGraph;
+import eu.iv4xr.framework.mainConcepts.TestDataCollector;
 import eu.iv4xr.framework.mainConcepts.WorldEntity;
 import eu.iv4xr.framework.mainConcepts.WorldModel;
+import eu.iv4xr.framework.mainConcepts.ObservationEvent.VerdictEvent;
 import eu.iv4xr.framework.spatial.Vec3;
 import nl.uu.cs.aplib.utils.Pair;
 
@@ -494,6 +496,101 @@ public class Utils {
 			
 		}
     	
+    	
+    	
+    }
+    
+    
+    public static void CheckInvItemValues(MyAgentState S) {
+    	
+    	WorldEntity inv = S.wom.getElement("Inventory");
+    	boolean passTest;
+    	TestDataCollector collector = S.owner.getTestDataCollector() ;
+		
+    	
+    	for(WorldEntity item : inv.elements.values()) {
+    		
+    		if( (item.type.equals("Food") || item.type.equals("Water") || item.type.equals("HealthPotion")) ) {
+          		
+          		int restoreAmount = item.getIntProperty("restoreAmount");
+          		
+          		if (restoreAmount > 0) {
+          			
+          			System.out.println("The life restore amount is a valid number");
+          			passTest = true;
+          			
+          			
+          		}
+          		else {
+          			
+          			System.out.println("The life restore amount is NOT a valid number");
+          			passTest = false;
+          			
+          		}
+          		
+          		
+          		if(collector != null) {
+      				VerdictEvent verdict = new VerdictEvent("Health restoration checking",
+      						item.type + " restoring " + restoreAmount,
+      						passTest) ;
+      				collector.registerEvent(S.owner.getId(), verdict) ;
+      			}
+          		
+          		
+          	}
+    		else if (item.type.equals("Bow") || item.type.equals("Sword")) {
+    			
+    			int attackDmg = item.getIntProperty("attackDmg");
+    			
+    			if (attackDmg > 0) {
+          			
+          			System.out.println("The attack damage of the weapon is a valid number");
+          			passTest = true;
+          			
+          			
+          		}
+          		else {
+          			
+          			System.out.println("The attack damage of the weapon is NOT a valid number");
+          			passTest = false;
+          			
+          		}
+    			
+    			
+    			if(collector != null) {
+      				VerdictEvent verdict = new VerdictEvent("Attack damage checking",
+      						item.type + " attacks for " + attackDmg,
+      						passTest) ;
+      				collector.registerEvent(S.owner.getId(), verdict) ;
+      			}
+    			
+    		}
+    		else if (item.type.equals("Gold")){
+    			
+    			int goldAmount = item.getIntProperty("amount");
+    			
+    			if (goldAmount > 0) {
+          			
+          			System.out.println("The gold amount is a valid number");
+          			passTest = true;
+          			
+          			
+          		}
+          		else {
+          			
+          			System.out.println("The gold amount is NOT a valid number");
+          			passTest = false;
+          		}
+    			
+    			if(collector != null) {
+      				VerdictEvent verdict = new VerdictEvent("Gold amount checking",
+      						item.type + " amount: " + goldAmount,
+      						passTest) ;
+      				collector.registerEvent(S.owner.getId(), verdict) ;
+      			}
+    			
+    		}
+    	}
     	
     	
     }

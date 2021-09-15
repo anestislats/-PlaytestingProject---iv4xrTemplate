@@ -11,6 +11,7 @@ import java.util.List;
 import org.projectxy.iv4xrLib.NethackWrapper.Interact;
 import org.projectxy.iv4xrLib.NethackWrapper.Movement;
 
+import A.B.Bow;
 import A.B.Food;
 import A.B.HealthPotion;
 import A.B.Monster;
@@ -506,7 +507,104 @@ public class TacticLib {
 	    return SEQ(deployNewGoal.lift(), ABORT()) ;
 	    
 	}
+	
+	
+	public static Tactic collectBowWeapon(TestAgent agent, float monsterAvoidDistance) {
+	    Action deployNewGoal =  action("collect bow weapon if not in inventory").do2((MyAgentState S) -> (String itemId) -> { 
+	    	
+			
+			
+			System.out.println(">>> deploying a new goal to get a bow weapon with id: " + itemId) ;
+			GoalStructure g2 = 
+			    FIRSTof(
+			        SEQ(GoalLib.locationVisited_1(itemId,null,monsterAvoidDistance).lift(),
+			            GoalLib.pickUpItem()),
+			        SUCCESS());
+			agent.addBefore(g2) ;
+			return S ;
+	    })
+		.on((MyAgentState S) -> { 
+			
+		    if (!S.isAlive()) return null ;
+			
+			WorldModel current = S.wom ;
+	        WorldEntity inv = current.getElement("Inventory");
+	        String agentId = S.wom.agentId ; 
+	        WorldEntity agentCurrentState = current.elements.get(agentId) ;
+	        int currentLevel = agentCurrentState.getIntProperty("currentLevel") ;
+	        
+	        
+	        String currentWeapon = agentCurrentState.getStringProperty("equippedWeaponName") ;
+	        
+	        
+	        
+	        boolean bowInInventory = false;
+	        String closestItemId = null ;
+	        
+	        
+	        if (currentLevel%5 !=0) {
+	        	
+	        	//System.out.println("currentLevel%5: "+ currentLevel%5);
+	        
+		        for(WorldEntity item_ : inv.elements.values()) {
+	
+		          	if ( item_.type.equals("Bow") ) {
+		          		
+		          		bowInInventory = true;
+		          		
+		          	}
+		         }
+		        
+		        
+		        if (!bowInInventory || !currentWeapon.contains("Bow")  ) {
+		        	
+		        	int minDistance = 70; //the maximum distance possible in our tile grid (90x50) /2
+		        	WorldEntity stairs = S.wom.getElement("Stairs") ;
+		        	for(WorldEntity i : S.wom.elements.values()) {
+		        	     if( i.type.equals(Bow.class.getSimpleName()) )  
+		                		  {	// looking for health items 
+		                	 
+		                	 //System.out.println("TYPE: "+ i.type);
+	
+		        	         // ignore it if it is a health item which happens to be ON the stairs:
+		                     if(stairs!=null && Utils.sameTile(stairs.position, i.position)) continue ;
+		                       
+		                	 int ix = (int) i.position.x; 					// item's x coordinate
+		                     int iy = (int) i.position.y;					// item's y coordinate
+		                     int ax = (int) current.position.x;				// agent's x coordinate
+		                     int ay = (int) current.position.y;				// agent's y coordinate
+		                     
+		                     int dx = (int) Math.abs(ax-ix) ; // agent-item distance in x axis
+		                     int dy = (int) Math.abs(ay-iy) ; // agent-item distance in y axis
+		                     
+		                     
+		                     
+		                     if (dx + dy < minDistance) {
+		                    	 
+		                    	 minDistance = dx + dy;
+		                    	 
+		                    	 closestItemId = i.id;
+		                    	 
+		                    	 
+		                         //return i.id ;
+		                     }
+		                 }
+		                 
+		             }
+		        	if(closestItemId != null) return closestItemId;
+		        	
+		        }
+	        }
+	        return null;
+	        
+	     }) ;
+	    
+	    return SEQ(deployNewGoal.lift(), ABORT()) ;
+	    
+	}
 
+	
+	
 	public static Tactic abortIfDead() {
 	    Action abort = new Action.Abort() ;
 	    

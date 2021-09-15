@@ -97,8 +97,6 @@ public class GoalLib {
 	        WorldModel current = S.wom ;
 	        
 	        
-      		System.out.println("2. AND HERE!");
-	        
 	        WorldEntity inv = current.getElement("Inventory");
 	        
 			boolean healthItemFoundAndUsed = false;
@@ -788,6 +786,7 @@ public class GoalLib {
 	    Tactic extendedTactic = FIRSTof(
 	            TacticLib.loadNewLevel().lift(), // FIX <---
 	            TacticLib.collectHealthItemsIfNeeded(agent,monsterAvoidDistance),
+	            TacticLib.collectBowWeapon(agent,monsterAvoidDistance),
 	            TacticLib.killBossFirst(agent),// won't be enabled if dead
 	            baseTactic // will abort if dead
 	            ) ;                       

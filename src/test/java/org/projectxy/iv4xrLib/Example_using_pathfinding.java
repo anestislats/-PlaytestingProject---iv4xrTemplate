@@ -271,11 +271,19 @@ public class Example_using_pathfinding {
 		state.owner = agent ;
 		agent.setTestDataCollector(collector) ;
 		
-		
+		String itemId="";
 		
 
 		for (WorldEntity e : state.wom.elements.values()) {
 			System.out.println(">>> " + e.type + ", id=" + e.id + ", @" + e.position);
+			
+//			if (e.type == "Bow") {
+//				
+//				itemId = e.id;
+//				
+//			}
+			
+			
 			
 //			int type = 0;
 			
@@ -312,9 +320,11 @@ public class Example_using_pathfinding {
 		//GoalStructure g = SEQ(Utils.entityVisited("78"), GoalLib.pickUpItem(), Utils.entityVisited("144"));
 		GoalStructure g = SEQ(
 							
+				
 							  // get a bow first
-							  SEQ( 	GoalLib.entityVisited(agent, "47",1), 
-									GoalLib.pickUpItem()),
+					         
+//							  SEQ( 	GoalLib.entityVisited(agent, itemId,1), 
+//									GoalLib.pickUpItem()),
 							  
 		                      GoalLib.entityVisited_5_level(agent,"Stairs",3)
 		                      
@@ -709,6 +719,27 @@ public class Example_using_pathfinding {
 				int currentLevel = agentCurrentState.getIntProperty("currentLevel") ;
 				int health = agentCurrentState.getIntProperty("health");
 				
+				
+//				// //////////////////////// Check all items in inventory ////////////////////////////////////////
+//				WorldModel old = state.previousWom ;
+//		        
+//		        WorldEntity oldInv = old.getElement("Inventory");
+//		        WorldEntity currentInv = current.getElement("Inventory");
+//		        
+//		        int oldInvSize = oldInv.elements.size();
+//		        int currentInvSize = currentInv.elements.size();
+//		        
+//		        
+//		        
+//		        if (currentInvSize > oldInvSize) {
+//		        	
+//		        	Utils.CheckInvItemValues(state);
+//		        	
+//		        }
+		        
+		        
+				
+				
 
 				ScalarTracingEvent scalarValues = new ScalarTracingEvent(
 									
@@ -737,7 +768,7 @@ public class Example_using_pathfinding {
 			    turn++;
 				
 				Thread.sleep(50);
-				if (!state.isAlive() || turn > 500) {
+				if (!state.isAlive() || turn > 600) {
 					// forcing break the agent seems to take forever...
 					break;
 				}
@@ -768,6 +799,10 @@ public class Example_using_pathfinding {
 		agent.setGoal(g2);
 
 		int turn = 0;
+		int numberOfFailingCheck = 0 ;
+		int numberOfPassingCheck = 0 ;
+		
+		
 		while (g2.getStatus().inProgress()) {
 		    agent.update();
 		    turn++;
@@ -783,6 +818,56 @@ public class Example_using_pathfinding {
 		System.out.println(">>> Goal status:" + g2.getStatus());
 	
 		g2.printGoalStructureStatus();
+		
+		
+		
+//		WorldEntity stairs = state.wom.getElement("Stairs");
+//		int stairX = (int) stairs.position.x;
+//		int stairY = (int) stairs.position.y;
+//		
+//		int dx = (int) (state.wom.position.x - stairX);
+//		int dy = (int) (state.wom.position.y - stairY);
+		
+		
+			
+		Utils.CheckInvItemValues(state);
+			
+		
+		
+		
+		
+		
+		
+		
+		int numberOfNewFails = agent.getTestDataCollector().getNumberOfFailVerdictsSeen() -  numberOfFailingCheck ;
+		
+		int numberOfNewPasses = agent.getTestDataCollector().getNumberOfPassVerdictsSeen() - numberOfPassingCheck;
+		
+		
+		numberOfPassingCheck += numberOfNewPasses;
+		numberOfFailingCheck += numberOfNewFails ;
+		
+		
+		
+		ScalarTracingEvent scalarValues1 = new ScalarTracingEvent(
+				
+				new Pair("newTests", (collector.getNumberOfPassVerdictsSeen() + collector.getNumberOfFailVerdictsSeen())),
+				new Pair("newPasses", numberOfNewPasses),
+				new Pair("newFails", numberOfNewFails)
+				
+				
+				) ;		
+
+		agent.getTestDataCollector().registerEvent(agent.getId(), scalarValues1);
+		
+	
+		System.out.println("** Rest items: Number of passes: "  + collector.getNumberOfPassVerdictsSeen()) ;
+		System.out.println("** Rest items: Number of violations: "  + collector.getNumberOfFailVerdictsSeen()) ;
+		collector.getTestAgentTrace(agent.getId()) ;
+
+		//assertTrue(collector.getNumberOfFailVerdictsSeen() == 0) ;
+		collector.saveTestAgentScalarsTraceAsCSV(agent.getId(), "Testing rest items.csv");
+		
 		
 		
 		
