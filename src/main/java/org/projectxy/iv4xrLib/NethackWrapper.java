@@ -37,6 +37,21 @@ public class NethackWrapper {
      *             this conf is not used.
      * @return
      */
+    public Thread launchNethack(NethackConfiguration conf, int seed) {
+        // for now we ignore the configuration
+        nethack = new Screen(seed);
+        JFrame frame = new JFrame("NetHack Clone");
+        nethackWindow = frame;
+        frame.add(nethack);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        frame.setVisible(true);
+        Thread t = new Thread(() -> nethack.animate());
+        t.start();
+        return t;
+    }
+    
+    
     public Thread launchNethack(NethackConfiguration conf) {
         // for now we ignore the configuration
         nethack = new Screen();
@@ -465,7 +480,7 @@ public class NethackWrapper {
 
         NethackConfiguration conf = new NethackConfiguration() ;
         NethackWrapper driver = new NethackWrapper();
-        driver.launchNethack(conf) ;
+        driver.launchNethack(conf, 1) ;	// 1 is the seed number 
         
         /*
         driver.nethack = new Screen();

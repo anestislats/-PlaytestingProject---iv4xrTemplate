@@ -448,7 +448,7 @@ public class Utils {
 		int steps = (int) S.wom.timestamp;
 		
 		
-		if ( dxPlusdy<=1 && steps%8==0 ) {
+		if ( dxPlusdy<=1 && steps%16==0 ) {
 		
 			lifeDif = previousAgentLife - (currentAgentLife + 1);
 		}

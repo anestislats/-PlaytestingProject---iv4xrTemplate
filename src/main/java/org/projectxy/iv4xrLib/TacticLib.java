@@ -455,7 +455,7 @@ public class TacticLib {
 		        	
 		        	System.out.println("Number of health items in inventory: "+ healthItemsCounter);
 		        	
-		        	int minDistance = 30; //the maximum distance possible in our tile grid (90x50) /2
+		        	int minDistance = 50; //the maximum distance possible in our tile grid (90x50) /2
 		        	WorldEntity stairs = S.wom.getElement("Stairs") ;
 		        	for(WorldEntity i : S.wom.elements.values()) {
 		        	     if(	(i.type.equals(HealthPotion.class.getSimpleName()) ) ||
@@ -556,9 +556,9 @@ public class TacticLib {
 		         }
 		        
 		        
-		        if (!bowInInventory || !currentWeapon.contains("Bow")  ) {
+		        if (!bowInInventory || !currentWeapon.contains(Bow.class.getSimpleName())  ) {
 		        	
-		        	int minDistance = 70; //the maximum distance possible in our tile grid (90x50) /2
+		        	int minDistance = 110;		//the 1/3rd of the maximum distance possible in our tile grid (90x50) 
 		        	WorldEntity stairs = S.wom.getElement("Stairs") ;
 		        	for(WorldEntity i : S.wom.elements.values()) {
 		        	     if( i.type.equals(Bow.class.getSimpleName()) )  
@@ -935,26 +935,45 @@ public class TacticLib {
 		    })
 			.on((MyAgentState S) -> { 
 				WorldModel current = S.wom ;
+				WorldModel previous = S.previousWom ;
+
+				
 		       
 		        String bowWeapon = "Bow";
 		        String swordWeapon = "Sword";
 	
 		        WorldEntity currentInv = current.getElement("Inventory"); 
-		        
+		        //WorldEntity previousInv = previous.getElement("Inventory"); 
+
 		        String agentId = S.wom.agentId ;
 		        WorldEntity agentCurrentState = current.elements.get(agentId) ;
 		        int bestWeaponDmg = agentCurrentState.getIntProperty("equippedWeaponDmg");
+		        String currentEquippedWeapon = agentCurrentState.getStringProperty("equippedWeaponName");
+		        
+		        
+		        WorldEntity agentPreviousState = previous.elements.get(agentId) ;
+		        String previousEquippedWeapon = agentPreviousState.getStringProperty("equippedWeaponName");
+ 
+		        
 	
 		        for(WorldEntity item_ : currentInv.elements.values()) {
 	          		//System.out.println("In inv: " + item_.type + ","+ item_.id);
 	          		if ((item_.type.toLowerCase().contains(bowWeapon.toLowerCase())) || (item_.type.toLowerCase().contains(swordWeapon.toLowerCase()))){      	
 		          		int dmg = item_.getIntProperty("attackDmg");
+		          		
+//		          		if (	(dmg >= bestWeaponDmg) && (item_.type.contains(Bow.class.getSimpleName())) && (currentEquippedWeapon != previousEquippedWeapon )	) {
+//		          			String itemId = item_.id;
+//		          			return itemId;
+//		          			
+//		          		}
+		          		
 		
-			          	if( dmg > bestWeaponDmg   ) {
+			          	if (dmg > bestWeaponDmg)    {
 			          		//System.out.println("AND HERE!");
 			          		
 			          		bestWeaponDmg = dmg;
 			          		String itemId = item_.id;
+			          		
 			          	       
 			          		System.out.println("Equipped item type: " + item_.type);
 			          		System.out.println("Equipped item damage: " + dmg);

@@ -1,259 +1,72 @@
 package org.projectxy.iv4xrLib;
 
-import static nl.uu.cs.aplib.AplibEDSL.*;
-
-
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import static nl.uu.cs.aplib.AplibEDSL.FIRSTof;
+import static nl.uu.cs.aplib.AplibEDSL.IFELSE;
+import static nl.uu.cs.aplib.AplibEDSL.SEQ;
+import static nl.uu.cs.aplib.AplibEDSL.SUCCESS;
 
 import java.io.IOException;
-import java.util.stream.Collector;
 
-import eu.iv4xr.framework.mainConcepts.ObservationEvent.ScalarTracingEvent;
-import eu.iv4xr.framework.mainConcepts.ObservationEvent.VerdictEvent;
+import A.B.Bow;
+import A.B.Food;
+import A.B.Gold;
+import A.B.HealthPotion;
+import A.B.Monster;
+import A.B.Sword;
+import A.B.Water;
+import A.B.Weapon;
 import eu.iv4xr.framework.mainConcepts.TestAgent;
 import eu.iv4xr.framework.mainConcepts.TestDataCollector;
 import eu.iv4xr.framework.mainConcepts.WorldEntity;
 import eu.iv4xr.framework.mainConcepts.WorldModel;
-import eu.iv4xr.framework.spatial.Vec3;
-
+import eu.iv4xr.framework.mainConcepts.ObservationEvent.ScalarTracingEvent;
+import eu.iv4xr.framework.mainConcepts.ObservationEvent.VerdictEvent;
 import nl.uu.cs.aplib.mainConcepts.GoalStructure;
 import nl.uu.cs.aplib.utils.Pair;
-import A.B.Monster;
-import A.B.HealthPotion;
-import A.B.Food;
-import A.B.Water;
-import A.B.Gold;
-import A.B.Sword;
-import A.B.Bow;
 
+public class myClass {
 
-
-
-public class Example_using_pathfinding {
-
-	@Test
-	public void test_navigate_to_a_location() throws InterruptedException, IOException {
-		// launch the game:
-		NethackWrapper driver = new NethackWrapper();
-		driver.launchNethack(new NethackConfiguration());
-
-		// Create an agent, and attaching to it a clean state and environment:
-		TestAgent agent = new TestAgent();
-		MyAgentState state = new MyAgentState();
-		TestDataCollector collector = new TestDataCollector() ;
-		agent.attachState(state);
-		state.owner = agent ;
-		MyEnv env = new MyEnv(driver);
-		agent.attachEnvironment(env);
-		agent.setTestDataCollector(collector) ;
-
-		// give a goal-structure to the agent:
-		Vec3 destination = new Vec3(40, 6, 0);
-
-		// a goal to guide agent to the given location; with monster-avoindance distance
-		// set to 3:
-		GoalStructure g = GoalLib.locationVisited(agent,null, destination, 3);
-		agent.setGoal(SEQ(g)); // have to pack it inside a SEQ for dynamic goal to work
-
-		// run the agent to control the game:
-		// System.out.println("type anything... ") ;
-		// new Scanner(System.in) . nextLine() ;
-
-		int turn = 0;
-		int numberOfFailingCheck = 0 ;
-		while (!g.getStatus().success()) {
+	static boolean reach_the_stairs_until_fifth_level = true;
+	static boolean interact_with_everything_and_reach_the_stairs = true;
+	
+	
+	public static void main(String[] args) throws InterruptedException, IOException {
+		
+		for (int i = 23456; i < 23460; i++) {
 			
-			int numberOfNewFails = agent.getTestDataCollector().getNumberOfFailVerdictsSeen() -  numberOfFailingCheck ;
-			numberOfFailingCheck += numberOfNewFails ;
+			if (reach_the_stairs_until_fifth_level) {
+				reach_the_stairs_until_fifth_level(i);
+			}
 			
-			ScalarTracingEvent scalarValues = new ScalarTracingEvent(
-					new Pair("posx", state.wom.position.x) ,
-					new Pair("posz", state.wom.position.y) ,
-					new Pair("newFails", numberOfNewFails)
-					// new Pair("health"), .... the health of agent
-					) ;		
-			agent.getTestDataCollector().registerEvent(agent.getId(), scalarValues);
 			
-			agent.update();		
-			turn++;
-			System.out.println("[" + turn + "] agent@" + state.wom.position);
-			Thread.sleep(100);
-			if (turn > 100) {
-				// forcing break the agent seems to take forever...
-				break;
+			if (interact_with_everything_and_reach_the_stairs) {
+				interact_with_everything_and_reach_the_stairs(i);
 			}
+			
 		}
-		assertTrue(Utils.sameTile(state.wom.position, destination));
-		
-		System.out.println("** Number of passes: "  + collector.getNumberOfPassVerdictsSeen()) ;
-		System.out.println("** Number of violations: "  + collector.getNumberOfFailVerdictsSeen()) ;
-		//collector.getTestAgentTrace(agent.getId()) ;
-		assertTrue(collector.getNumberOfFailVerdictsSeen() == 0) ;
-		collector.saveTestAgentScalarsTraceAsCSV(agent.getId(), "filename.csv");
-	}
- 
-	// this test fails because a monster moves to block a tile along the path;
-	// this needs to be handled. todo.
-	@Test
-	public void test_navigate_to_an_entity() throws InterruptedException {
-		NethackWrapper driver = new NethackWrapper();
-		driver.launchNethack(new NethackConfiguration());
-
-		TestAgent agent = new TestAgent();
-		MyAgentState state = new MyAgentState();
-		agent.attachState(state);
-		MyEnv env = new MyEnv(driver);
-		agent.attachEnvironment(env);
-
-		// give a goal-structure to the agent:
-		GoalStructure g =  GoalLib.entityVisited(agent,"17",3);
-		//GoalStructure g = SEQ(GoalLib.equipBow(), Utils.entityVisited("85"));
-		agent.setGoal(SEQ(g));
-
-		// run the agent to control the game:
-		for(WorldEntity e : state.wom.elements.values()) {
-		 System.out.println(">>> " + e.type + ", id=" + e.id + ", @" + e.position) ;
-		 }
-		int turn = 0;
-		while (g.getStatus().inProgress()) {
-			agent.update();
-			turn++;
-			System.out.println("[" + turn + "] agent@" + state.wom.position);
-			Thread.sleep(100);
-			if (turn > 200) { // forcing break the agent seems to take forever...
-				break;
-			}
-		}
-
-		for (WorldEntity e : state.wom.elements.values()) {
-			System.out.println(">>> " + e.type + ", id=" + e.id + ", @" + e.position);
-		}
-		System.out.println("Goal status: " + g.getStatus());
-	}
-
-	@Test
-	public void test_navigate_to_a_monster() throws InterruptedException { 
-		NethackWrapper driver = new NethackWrapper();
-		driver.launchNethack(new NethackConfiguration());
-
-		TestAgent agent = new TestAgent();
-		MyAgentState state = new MyAgentState();
-		agent.attachState(state);
-		MyEnv env = new MyEnv(driver);
-		agent.attachEnvironment(env);
-
-		// give a goal-structure to the agent:
-		//GoalStructure g =  Utils.entityVisited("162");
-		//GoalStructure g = SEQ(GoalLib.equipBestAvailableWeapon(), Utils.closeToAMonster("161", 3));
-		 GoalStructure g = GoalLib.closeToAMonster(agent,"157",3) ;
-		
-		agent.setGoal(SEQ(g)); // have to pack it inside a SEQ for dynamic goal to work...
-
-		for (WorldEntity e : state.wom.elements.values()) {
-			System.out.println(">>> " + e.type + ", id=" + e.id + ", @" + e.position);
-		}
-
-		int turn = 0;
-		while (g.getStatus().inProgress()) {
-			agent.update();
-			turn++;
-			System.out.println("[" + turn + "] agent@" + state.wom.position);
-			Thread.sleep(300);
-			if (turn > 100) { // forcing break the agent seems to take forever...
-				break;
-			}
-		}
-		System.out.println("Goal status: " + g.getStatus());
-		for (WorldEntity e : state.wom.elements.values()) {
-			System.out.println(">>> " + e.type + ", id=" + e.id + ", @" + e.position);
-		}
-
-	}
-
-	@Test
-	public void test_navigate_to_an_entity_and_pickitup() throws InterruptedException {
-		// launch the game:
-  
-		NethackWrapper driver = new NethackWrapper();
-		driver.launchNethack(new NethackConfiguration());
-
-		// Create an agent, and attaching to it a clean state and environment:
-		TestAgent agent = new TestAgent();
-		MyAgentState state = new MyAgentState();
-		agent.attachState(state);
-		MyEnv env = new MyEnv(driver);
-		agent.attachEnvironment(env);
-
-		for (WorldEntity e : state.wom.elements.values()) {
-			System.out.println(">>> " + e.type + ", id=" + e.id + ", @" + e.position);
-		}
-
-		// give a goal-structure to the agent:
-		//GoalStructure g = SEQ(Utils.entityVisited("78"), GoalLib.pickUpItem(), Utils.entityVisited("144"));
-		GoalStructure g = SEQ(GoalLib.entityVisited(agent,"77",3), 
-		                      GoalLib.pickUpItem(), 
-		                      GoalLib.closeToAMonster(agent, "160", 3),
-		                      GoalLib.closeToAMonster(agent, "154", 3),
-		                      GoalLib.closeToAMonster(agent, "159", 3));
-
-		
-		//GoalStructure g = SEQ( Utils.closeToAMonster("161", 3),Utils.entityVisited("78"));
-
-		agent.setGoal(g);
-
-		// run the agent to control the game:
-
-		int turn = 0;
-		while (g.getStatus().inProgress()) {
-		    agent.update() ;
-			//try {agent.update();} catch (Exception e) {
-			//	for (WorldEntity we : state.wom.elements.values()) {
-			//		System.out.println(">>> " + we.type + ", id=" + we.id + ", @" + we.position);
-			//	}
-			//	g.printGoalStructureStatus();
-			//	throw e;
-			//} 
-			turn++;
-			System.out.println("[" + turn + "] agent@" + state.wom.position + ", Alive:" + state.isAlive());
-			Thread.sleep(250);
-			if (turn > 500) {
-				// forcing break the agent seems to take forever...
-				break;
-			}
-		}
-		
-		//////
-		/*
-		 * GoalStructure g_ = GoalLib.pickUpItem(); agent.setGoal(g_) ;
-		 * 
-		 * int turn1 = 0 ; while(!g_.getStatus().success()) { agent.update(); turn1++ ;
-		 * 
-		 * Thread.sleep(350); if(turn > 100) {
-		 * 
-		 * break ; } }
-		 */
-		///////
-		for (WorldEntity e : state.wom.elements.values()) {
-			System.out.println(">>> " + e.type + ", id=" + e.id + ", @" + e.position);
-		}
-		g.printGoalStructureStatus();
-		System.out.println(">>> Goal status:" + g.getStatus());
 		
 	}
 
 	
-	@Test
-	public void reach_the_stairs_until_fifth_level() throws InterruptedException, IOException {
+	////////////////////////////////////////
+	///////////////////////////////////////
+	
+	public static void reach_the_stairs_until_fifth_level(int seed) throws InterruptedException, IOException {
 		// This goal lets the agent going through levels by reaching the stairs, until it reaches the 5th level (first Boss)
 		
 		// Measure the execution time until the goal is reached
 		long start = System.currentTimeMillis();
+		int testCompletedSuccessfully = 0;
+		
+		
+		int monX=-1, monY = -1;
+		int healX=-1, healY = -1;
+		int weapX=-1, weapY = -1;
 		
 		
 		// launch the game:
 		NethackWrapper driver = new NethackWrapper();
-		driver.launchNethack(new NethackConfiguration(), 354893000);  // giving seed number 3 
+		driver.launchNethack(new NethackConfiguration(), seed);  // giving seed number 3 
 
 		// Create an agent, and attaching to it a clean state and environment:
 		TestAgent agent = new TestAgent();
@@ -271,63 +84,17 @@ public class Example_using_pathfinding {
 		state.owner = agent ;
 		agent.setTestDataCollector(collector) ;
 		
-		String itemId="";
+		// String itemId="";
 		
 
 		for (WorldEntity e : state.wom.elements.values()) {
 			System.out.println(">>> " + e.type + ", id=" + e.id + ", @" + e.position);
-			
-//			if (e.type == "Bow") {
-//				
-//				itemId = e.id;
-//				
-//			}
-			
-			
-			
-//			int type = 0;
-			
-//			if (e.type == "HealthPotion") { type = 1;}
-//			else if (e.type == "Monster" ) { type = 2;}
-//			else if (e.type == "Food" ) { type = 3;}
-//			else if (e.type == "Water" ) { type = 4;}
-//			else if (e.type == "Bow" ) { type = 5;}
-//			else if (e.type == "Sword" ) { type = 6;}
-//			else if (e.type == "Gold" ) { type = 7;}
-			
-			
-//			if (e.position != null) {
-//				ScalarTracingEvent scalarValues = new ScalarTracingEvent(
-//						new Pair("type", (String) e.type ) , 
-//						new Pair("posx", e.position.x) ,
-//						new Pair("posz", e.position.y),
-//						
-//						new Pair("level", agentCurrentState.getIntProperty("currentLevel"))
-//						
-//						
-//						// new Pair("health"), .... the health of agent
-//						) ;	
-//				
-//				agent.getTestDataCollector().registerEvent(agent.getId(), scalarValues);
-//			}
-//			
-			
 		}
 		
 		
-		
 		// give a goal-structure to the agent:
-		//GoalStructure g = SEQ(Utils.entityVisited("78"), GoalLib.pickUpItem(), Utils.entityVisited("144"));
 		GoalStructure g = SEQ(
-							
-				
-							  // get a bow first
-					         
-//							  SEQ( 	GoalLib.entityVisited(agent, itemId,1), 
-//									GoalLib.pickUpItem()),
-							  
 		                      GoalLib.entityVisited_5_level(agent,"Stairs",3)
-		                      
 		                      );
 
 		agent.setGoal(g);
@@ -380,9 +147,6 @@ public class Example_using_pathfinding {
 			    	correctAmountOfReceivedDmg = Utils.checkReceivedDmg(state, numOfNearbyMonsters, monsterAttackDmg, dxPlusdy );
 			    }
 			    
-			    //int monsterAttackDmg = Utils.monsterAttackDmg(state);
-			    //boolean correctAmountOfReceivedDmg = Utils.checkReceivedDmg(state, numOfNearbyMonsters, monsterAttackDmg );
-			    
 			    System.out.println("Was the correct amount of damage received from the monsters?		>>> "+ correctAmountOfReceivedDmg);
 		        System.out.println();
 		        
@@ -398,17 +162,9 @@ public class Example_using_pathfinding {
 			int numberOfNewPasses = agent.getTestDataCollector().getNumberOfPassVerdictsSeen() - numberOfPassingCheck;
 			numberOfPassingCheck += numberOfNewPasses;
 			
-			//String agentId = state.wom.agentId ;
-			//WorldEntity agentCurrentState = current.elements.get(agentId) ;
-			//WorldEntity agentPreviousState = previous.elements.get(agentId) ;
-				
 			int currentLevel = agentCurrentState.getIntProperty("currentLevel") ;
 			int health = agentCurrentState.getIntProperty("health");
 
-			
-//			for (WorldEntity e : state.wom.elements.values()) {
-//				System.out.println(">>>@@ " + e.type + ", id=" + e.id + ", @" + e.position);
-//			}
 			ScalarTracingEvent scalarValues = new ScalarTracingEvent(
 								new Pair("posx", state.wom.position.x) , 
 								new Pair("posz", state.wom.position.y) ,
@@ -424,17 +180,15 @@ public class Example_using_pathfinding {
 								new Pair("newFails", numberOfNewFails)
 								
 								
+//								// Collect these values to compare how different are the levels 
+//								new Pair("monsterAmount", monsterAmount),
+//								new Pair("healthPorAmount", healthPorAmount),
+//								new Pair("weaponAmount", weaponAmount)
 								
-								
-								// new Pair("health"), .... the health of agent
 								) ;		
 
 			agent.getTestDataCollector().registerEvent(agent.getId(), scalarValues);
-			
-//		    agent.update();
-//		    turn++;
-
-			
+		
 			Thread.sleep(50);
 			if (!state.isAlive() || turn > 1000) {
 				
@@ -451,16 +205,59 @@ public class Example_using_pathfinding {
 		//collector.getTestAgentTrace(agent.getId()) ;
 
 		//assertTrue(collector.getNumberOfFailVerdictsSeen() == 0) ;
-		collector.saveTestAgentScalarsTraceAsCSV(agent.getId(), "5level.seconds.passes.fails.timesteps.level.csv");
+		collector.saveTestAgentScalarsTraceAsCSV(agent.getId(), "Seed."+seed+".5level.x.y.level.health.seconds.steps.newtests.passes.fails.csv");
+	
+		////////////////////////////////// Check rest items in inventory ////////////////////////////////////////
+		
+		Utils.CheckInvItemValues(state);
+			
+		
+		int numberOfNewFails = agent.getTestDataCollector().getNumberOfFailVerdictsSeen() -  numberOfFailingCheck ;
+		
+		int numberOfNewPasses = agent.getTestDataCollector().getNumberOfPassVerdictsSeen() - numberOfPassingCheck;
 		
 		
-//		for (WorldEntity e : state.wom.elements.values()) {
-//			System.out.println(">>> " + e.type + ", id=" + e.id + ", @" + e.position);
-//		}
+		numberOfPassingCheck += numberOfNewPasses;
+		numberOfFailingCheck += numberOfNewFails ;
+		
+		
+		if (g.getStatus().success()) {
+			testCompletedSuccessfully = 1;
+		}
+		else if (g.getStatus().failed()) {
+			testCompletedSuccessfully = 0;
+		}
+		else {
+			testCompletedSuccessfully = 2;
+		}
+		
+		
+		System.out.println("test Completed Successfully:	>>> "+ testCompletedSuccessfully);		// 0 for fail, 1 for success, 2 otherwise (in progress) 
+		
+		ScalarTracingEvent scalarValues1 = new ScalarTracingEvent(
+				
+				new Pair("newTests", (collector.getNumberOfPassVerdictsSeen() + collector.getNumberOfFailVerdictsSeen())),
+				new Pair("newPasses", numberOfNewPasses),
+				new Pair("newFails", numberOfNewFails),
+				new Pair("seed",  seed),
+				new Pair("testCompletedSuccessfully", testCompletedSuccessfully)
+				
+				
+				) ;		
+
+		agent.getTestDataCollector().registerEvent(agent.getId(), scalarValues1);
+		
+	
+		System.out.println("** Rest items: Number of passes: "  + collector.getNumberOfPassVerdictsSeen()) ;
+		System.out.println("** Rest items: Number of violations: "  + collector.getNumberOfFailVerdictsSeen()) ;
+		collector.getTestAgentTrace(agent.getId()) ;
+
+		//assertTrue(collector.getNumberOfFailVerdictsSeen() == 0) ;
+		collector.saveTestAgentScalarsTraceAsCSV(agent.getId(), "Seed."+seed+".5level.Testing rest items.csv");
+		
 		System.out.println(">>> Agent alive:" + state.isAlive());
         System.out.println(">>> Goal status:" + g.getStatus());
-        
-        
+         
         // Stop timer and convert to seconds
         long elapsedTimeMillis = System.currentTimeMillis()-start;
 		float elapsedTimeSec = elapsedTimeMillis/1000F;
@@ -468,18 +265,20 @@ public class Example_using_pathfinding {
 		System.out.println(">>> Execution Time: " + elapsedTimeSec + "sec");
 	}
 	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	
-	@Test
-	public void interact_with_everything_and_reach_the_stairs() throws InterruptedException, IOException {
+	public static void interact_with_everything_and_reach_the_stairs(int seed) throws InterruptedException, IOException {
 		
 		// Measure the execution time until the goal is reached
 		long start = System.currentTimeMillis();
+		int testCompletedSuccessfully = 0;
 		
 		
 		// launch the game:
 		NethackWrapper driver = new NethackWrapper();
-		driver.launchNethack(new NethackConfiguration());
+		driver.launchNethack(new NethackConfiguration(),seed);
 
 		// Create an agent, and attaching to it a clean state and environment:
 		TestAgent agent = new TestAgent();
@@ -782,7 +581,7 @@ public class Example_using_pathfinding {
 			collector.getTestAgentTrace(agent.getId()) ;
 
 			//assertTrue(collector.getNumberOfFailVerdictsSeen() == 0) ;
-			collector.saveTestAgentScalarsTraceAsCSV(agent.getId(), "interact.posx.posz.newTests_Edit.csv");
+			collector.saveTestAgentScalarsTraceAsCSV(agent.getId(), "seed."+seed+".interact.posx.posz.health.level.seconds.steps.newTests.newPasses.newFails.csv");
 
 			
 			
@@ -849,12 +648,30 @@ public class Example_using_pathfinding {
 		numberOfFailingCheck += numberOfNewFails ;
 		
 		
+		if (g2.getStatus().success()) {
+			testCompletedSuccessfully = 1;
+		}
+		else if (g2.getStatus().failed()) {
+			testCompletedSuccessfully = 0;
+		}
+		else {
+			testCompletedSuccessfully = 2;
+		}
+		
+		
+		System.out.println("test Completed Successfully:	>>> "+ testCompletedSuccessfully);		// 0 for fail, 1 for success, 2 otherwise (in progress) 
+
+		
+		
+		
 		
 		ScalarTracingEvent scalarValues1 = new ScalarTracingEvent(
 				
 				new Pair("newTests", (collector.getNumberOfPassVerdictsSeen() + collector.getNumberOfFailVerdictsSeen())),
 				new Pair("newPasses", numberOfNewPasses),
-				new Pair("newFails", numberOfNewFails)
+				new Pair("newFails", numberOfNewFails),
+				new Pair("seed", seed),
+				new Pair("testCompletedSuccessfully", testCompletedSuccessfully)
 				
 				
 				) ;		
@@ -867,7 +684,7 @@ public class Example_using_pathfinding {
 		collector.getTestAgentTrace(agent.getId()) ;
 
 		//assertTrue(collector.getNumberOfFailVerdictsSeen() == 0) ;
-		collector.saveTestAgentScalarsTraceAsCSV(agent.getId(), "Testing rest items.csv");
+		collector.saveTestAgentScalarsTraceAsCSV(agent.getId(), "seed."+seed+".interact.Testing rest items.csv");
 		
 		
 		
@@ -878,6 +695,8 @@ public class Example_using_pathfinding {
 		System.out.println(">>> Execution Time: " + elapsedTimeSec + "sec");
 		
 	}
+	
+	
 	
 	
 	
