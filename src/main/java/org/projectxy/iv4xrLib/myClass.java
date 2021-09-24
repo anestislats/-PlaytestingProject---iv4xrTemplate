@@ -27,12 +27,13 @@ import nl.uu.cs.aplib.utils.Pair;
 public class myClass {
 
 	static boolean reach_the_stairs_until_fifth_level = true;
-	static boolean interact_with_everything_and_reach_the_stairs = true;
+	static boolean interact_with_everything_and_reach_the_stairs = false;
 	
 	
 	public static void main(String[] args) throws InterruptedException, IOException {
 		
-		for (int i = 23456; i < 23460; i++) {
+		// i is our seed numbers
+		for (int i = 15440; i < 15451; i++) {
 			
 			if (reach_the_stairs_until_fifth_level) {
 				reach_the_stairs_until_fifth_level(i);

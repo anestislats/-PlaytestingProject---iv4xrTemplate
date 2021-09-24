@@ -253,7 +253,7 @@ public class Example_using_pathfinding {
 		
 		// launch the game:
 		NethackWrapper driver = new NethackWrapper();
-		driver.launchNethack(new NethackConfiguration(), 354893000);  // giving seed number 3 
+		driver.launchNethack(new NethackConfiguration(), 1);  // giving seed number 3 
 
 		// Create an agent, and attaching to it a clean state and environment:
 		TestAgent agent = new TestAgent();
